@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { computed, nextTick, onMounted, ref } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 import ToDoListItem from './ToDoListItem.vue';
 import { useTodoStore, TodoItem } from '../store/todoStore';
 import { storeToRefs } from 'pinia';
 import draggable from 'vuedraggable';
-import { db } from '../firebase/index.js';
+import { db } from '../firebase/index.ts';
 import { collection, deleteDoc, doc, getDocs, setDoc } from 'firebase/firestore';
 
 const { allTodoList, allCompleted, activetasks, completedTasks } = storeToRefs(useTodoStore());
@@ -88,13 +88,13 @@ async function saveToServer() {
   const todosCollection = collection(db, 'todos');
   const existingTodosSnapshot = await getDocs(todosCollection);
 
-  const existingTodos: TodoItem[] = [];
-  existingTodosSnapshot.forEach((doc) => {
+  const existingTodos: Record<string, TodoItem> = {};
+  existingTodosSnapshot.forEach((doc: any) => {
     existingTodos[doc.id] = doc.data();
   });
 
-  const localTodos: TodoItem[] = [];
-  allTodoList.value.forEach((todo) => {
+  const localTodos: Record<string, { name: string; completed: boolean }> = {};
+  allTodoList.value.forEach((todo: TodoItem) => {
     localTodos[todo.id] = { name: todo.name, completed: todo.completed };
   });
 
